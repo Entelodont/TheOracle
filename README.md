@@ -7,3 +7,7 @@ The project will consist of implementing machine learning techniques for conflic
 Hive and Pig. We will closely follow the framework set up by Chris Perry (Machine Learning and Conflict Prediction: A Use Case)
 and hope to improve upon his results by including additional features. Along with the Naive Bayes and Random Forest algorithms
 used by Perry, a Hidden Markov Model will also be evaluated. 
+
+# Colophon
+
+The Entelodont (hell pig or terminator pig) are a species of pig-like omnivores that roamed the forests and plained of North America, Europe, and Asia. Traces have been found from the middle Eocene to early Miocene epochs. 
