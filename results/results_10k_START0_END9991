@@ -1,0 +1,32 @@
+Start = 0
+End = 9991
+
+scala> println("The distance is ", distance)
+(The distance is ,(9991,0.32427007))
+
+scala> 
+
+scala> val algorithm_finish_time = System.currentTimeMillis
+algorithm_finish_time: Long = 1463297804536
+
+scala> 
+
+scala> val total_time = (algorithm_finish_time - start_time)/1000
+total_time: Long = 1161
+
+scala> val algorithm_time = (algorithm_finish_time - graph_creation_time)/1000
+algorithm_time: Long = 1074
+
+scala> val graph_time = (graph_creation_time - start_time)/1000
+graph_time: Long = 86
+
+scala> 
+
+scala> println("total time is (in seconds) ", total_time)
+(total time is (in seconds) ,1161)
+
+scala> println("total algo time is (in seconds) ", algorithm_time)
+(total algo time is (in seconds) ,1074)
+
+scala> println("total graph time is (in seconds) ", graph_time)
+(total graph time is (in seconds) ,86)
