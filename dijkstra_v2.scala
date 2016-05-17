@@ -5,58 +5,29 @@ import scala.io.Source
 import org.apache.spark.graphx.impl.{EdgePartitionBuilder, GraphImpl}
 
 // val FILENAME = "/Users/vincentpham/Desktop/distributed/training_small.txt"
-val FILENAME = "/Users/vincentpham/Desktop/distributed/tinyEWD.txt"
-//bin/hadoop fs -get /user/hadoop/data/largeEWD.txt /home/hadoop/
+// val FILENAME = "/Users/vincentpham/Desktop/distributed/tinyEWD.txt"
+// hadoop fs -get /user/hadoop/largeEWD.txt /home/hadoop/
 // val FILENAME = "/home/hadoop/training_small.txt"
 // val FILENAME = "/home/hadoop/largeEWD.txt"
+val FILENAME = "/user/hadoop/training_small.txt"
 // val FILENAME = "/Users/vincentpham/Desktop/distributed/largeEWD.txt"
-
+// hadoop fs -cp s3://aws-logs-784570650370-us-west-2/elasticmapreduce/data/training_small.txt /user/hadoop/
 //Set the destination path
 val start = 0L
-val end = 999999L
-val num_nodes = 999999L
-val sourceId: VertexId = 0
+val end = 9999L
+val num_nodes = 9999L
 
 val start_time = System.currentTimeMillis
 
-var edgeArray = Array(Edge(0L,0L,0F))
-// var vertexArray = new Array[(Long,Float)](0)
-
-// var vertexArray = Array((0L,(Float.PositiveInfinity)))
-//READ IN THE FILE
-// val source = Source.fromFile("/Users/vincentpham/Desktop/distributed/tinyEWD.txt")
-val source = Source.fromFile(FILENAME)
-val lines = source.getLines.toArray
-
-//Loop through lines adding to Arrays
-for (i <- 2 until lines.length) {
-  var triple = lines(i).trim.split("\\s+")
-  var e1 = triple(0).toLong
-  var e2 = triple(1).toLong
-  var e3 = triple(2).toFloat
-  if (e1 != e2) {
-    val new_edge = Edge(triple(0).toLong, triple(1).toLong, triple(2).toFloat)
-    edgeArray = edgeArray :+ new_edge
-  }
-  // vertexArray = vertexArray :+ ((e1,(Float.PositiveInfinity))) 
-  // vertexArray = vertexArray :+ ((e2,(Float.PositiveInfinity))) 
-}
-
-val vertexArray = sc.parallelize((0L to num_nodes toArray).map{case e => (e, Float.PositiveInfinity)})
-
-val Edge_RDD: RDD[Edge[Float]] = sc.parallelize(edgeArray.slice(1,edgeArray.length))
-val vRDD= sc.parallelize(vertexArray)
+val rdd = sc.textFile(FILENAME)
+val Edge_RDD: RDD[Edge[Float]] = rdd.map{case line => line.trim.split("\\s+")}.filter{case line => line.size > 2}.map{case arr => Edge(arr(0).toLong, arr(1).toLong, arr(2).toFloat)}
+val vRDD = sc.parallelize((0L to num_nodes toArray).map{case e => (e, Float.PositiveInfinity)})
 
 var graph = Graph(vRDD, Edge_RDD).persist().cache()
-
 val graph_creation_time = System.currentTimeMillis
-
-
-// var visited = List(start)
 
 //initialize start to
 graph = graph.mapVertices((id, attr) => if (id == start) 0 else attr).persist().cache()
-
 
 val path_distance = graph.pregel(Float.PositiveInfinity)(
   (vertid, d, d_alt) => math.min(d, d_alt), 
@@ -73,7 +44,6 @@ val path_distance = graph.pregel(Float.PositiveInfinity)(
 val distance = path_distance.vertices.filter{case (id, w) => id == end}.collect()(0)
 
 //display answer
-// val distance = unvisited.filter{case (x,y) => x == end}(0)
 println("The distance is ", distance)
 
 val algorithm_finish_time = System.currentTimeMillis
